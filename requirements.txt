@@ -13,4 +13,4 @@ requests
 lxml
 bs4
 numpy
-webdriver_manager
+webdriver-manager

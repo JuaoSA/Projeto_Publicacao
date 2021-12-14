@@ -32,6 +32,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.utils import ChromeType
 
 @st.cache()
 def busca(autor):
@@ -150,7 +153,7 @@ def parsing(url):
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 
-    wd = webdriver.Chrome(ChromeDriverManager().install())
+    wd = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
     wd.set_page_load_timeout(300)
     wd.get(url)
     time.sleep(5)
