@@ -1,0 +1,16 @@
+scholarly
+fuzzywuzzy
+pyngrok
+lxml
+semanticscholar
+selenium
+rdflib
+owlrl
+sparqlwrapper
+streamlit
+texthero
+requests
+lxml
+bs4
+numpy
+webdriver-manager
