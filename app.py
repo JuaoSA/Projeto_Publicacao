@@ -33,7 +33,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 
-
 @st.cache()
 def busca(autor):
 
@@ -151,7 +150,7 @@ def parsing(url):
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 
-    wd = webdriver.Chrome(executable_path=r'chromedriver.exe')
+    wd = webdriver.Chrome(ChromeDriverManager().install())
     wd.set_page_load_timeout(300)
     wd.get(url)
     time.sleep(5)
