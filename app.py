@@ -151,7 +151,7 @@ def parsing(url):
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 
-    wd = webdriver.Chrome(chromedriver.exe,chrome_options=options)
+    wd = webdriver.Chrome(chrome_options=options)
     wd.set_page_load_timeout(300)
     wd.get(url)
     time.sleep(5)
