@@ -1,0 +1,371 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#"
+     xml:base="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Afiliado -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Afiliado">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Classificada -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Classificada">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Detem -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Detem">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autoria_Cientifica"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Pesquisa -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Pesquisa">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicado_em -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicado_em">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Refere_se -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Refere_se">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autoria_Cientifica"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto_Autoral_Cientifico_Publicado"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Submetido -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Submetido">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto_Autoral_Cientifico_Publicado"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Citacao -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Citacao">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_IndiceH -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_IndiceH">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_indiceI10 -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_indiceI10">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Ano -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Ano">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Nome -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Nome">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Tipo -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Tipo">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Nome_Autor -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Nome_Autor">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao_Citacao -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao_Citacao">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis_Extrato -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis_Extrato">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Titulo_Artigo -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Titulo_Artigo">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo_Codigo -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo_Codigo">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa"/>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Pessoa"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autoria_Cientifica -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autoria_Cientifica"/>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao"/>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Pessoa -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Pessoa"/>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao"/>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto"/>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto_Autoral_Cientifico_Publicado -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto_Autoral_Cientifico_Publicado">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>A1</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>A2</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>A3</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A4 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A4">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>A4</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>B1</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>B2</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>B3</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B4 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B4">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>B4</Qualis_Extrato>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#C -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#C">
+        <rdf:type rdf:resource="http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis"/>
+        <Qualis_Extrato>C</Qualis_Extrato>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
