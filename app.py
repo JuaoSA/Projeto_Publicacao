@@ -26,16 +26,19 @@ import unicodedata
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.utils import ChromeType
-
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 @st.cache()
 def busca(autor):
 
@@ -148,12 +151,12 @@ def insere_dados_autor(posicao, dados):
 
 
 def parsing(url):
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-
-    wd = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+    firefoxOptions = Options()
+    firefoxOptions.add_argument("--headless")
+    driver = webdriver.Firefox(
+        options=firefoxOptions,
+        executable_path="/home/appuser/.conda/bin/geckodriver",
+    )
     wd.set_page_load_timeout(300)
     wd.get(url)
     time.sleep(5)
