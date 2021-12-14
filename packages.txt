@@ -1,0 +1,4 @@
+firefox-esr
+xvfb
+texthero
+semanticscholar
