@@ -5,7 +5,6 @@ from lxml import etree
 from bs4 import BeautifulSoup
 import streamlit as st
 import numpy as np
-from pyngrok import ngrok
 from scholarly import scholarly
 from st_aggrid import AgGrid
 import subprocess
