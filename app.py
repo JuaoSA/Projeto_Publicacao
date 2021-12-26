@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 import streamlit as st
 import numpy as np
 from scholarly import scholarly
-from st_aggrid import AgGrid
 import subprocess
 import sys
 import semanticscholar as sch
