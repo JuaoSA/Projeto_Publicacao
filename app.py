@@ -11,7 +11,6 @@ import sys
 import semanticscholar as sch
 import re
 import time
-from kora.selenium import wd
 from fuzzywuzzy import process
 from fuzzywuzzy import fuzz
 import texthero as hero
