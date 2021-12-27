@@ -27,11 +27,14 @@ import unicodedata
 import json
 import pandas as pd
 import time
-
+from scholarly import ProxyGenerator
 
 @st.cache()
 def busca(autor):
     dados = []
+    pg = ProxyGenerator()
+    pg.FreeProxies()
+    scholarly.use_proxy(pg)
     search_query = scholarly.search_author(autor)
     for x in search_query:
         dados.append(scholarly.fill(x, sections=['basics', 'indices',
@@ -51,7 +54,7 @@ def busca_data(id_autor, id_obra):
     proxy = get_proxy()
     session = requests.Session()
     session.proxies = {
-        'http': str(proxy.ip_and_port),
+        'http': 'http://'+str(proxy.ip_and_port)
     }
     URL = \
         'https://scholar.google.com.br/citations?view_op=view_citation&hl=pt-BR&user=' \
@@ -76,7 +79,7 @@ def busca_veiculo(id_autor, id_obra):
     proxy = get_proxy()
     session = requests.Session()
     session.proxies = {
-        'http': str(proxy.ip_and_port),
+        'http': 'http://'+str(proxy.ip_and_port)
     }
     dados = []
     URL = \
@@ -502,9 +505,9 @@ def gera_ontologia(base_principal):
     g.bind("pp", pp)
     nome_autor = base_principal['name']
     Interesses_autor = base_principal['interests']
-    Afiliação_autor = base_principal['affiliation']
+    Afiliacao_autor = base_principal['affiliation']
     nome_autor_limpo = re.sub('[,|\s]+', '_', clear_char(nome_autor))
-    Afiliacao_autor_limpo = re.sub('[,|\s]+', '_', clear_char(Afiliação_autor))
+    Afiliacao_autor_limpo = re.sub('[,|\s]+', '_', clear_char(Afiliacao_autor))
 
     # dados do autor
     g.add((pp[nome_autor_limpo], RDF.type, pp.Autor_Cientifico))
@@ -514,7 +517,7 @@ def gera_ontologia(base_principal):
     g.add((pp[nome_autor_limpo], pp.Autor_indiceI10, Literal(base_principal['i10index'])))
 
     g.add((pp[Afiliacao_autor_limpo], RDF.type, pp.Instituicao))
-    g.add((pp[Afiliacao_autor_limpo], pp.Instituicao, Literal(Afiliação_autor)))
+    g.add((pp[Afiliacao_autor_limpo], pp.Instituicao, Literal(Afiliacao_autor)))
 
     g.add((pp[nome_autor_limpo], pp.Afiliado, pp[Afiliacao_autor_limpo]))
 
