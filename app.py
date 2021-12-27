@@ -645,10 +645,10 @@ def main():
         base = insere_dados(res, dados)
         tabela = gera_ontologia(base)
         st.title(base['name'])
-        st.text(base['affiliation'])
-        st.text(base['interests'])
-        st.text(len(base['publications']))
-        st.text(base['citedby'])
+        st.text('Afiliação: ', base['affiliation'])
+        st.text('Interesses: ', base['interests'])
+        st.text('Total Publicações: ',len(base['publications']))
+        st.text('Citado por: ', base['citedby'])
         st.dataframe(tabela)
 
 
