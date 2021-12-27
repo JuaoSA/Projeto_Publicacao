@@ -646,7 +646,7 @@ def main():
         tabela = gera_ontologia(base)
         st.title(base['name'])
         st.text(base['affiliation'])
-        st.text(base['interests'][0])
+        st.text(base['interests'])
         st.text(len(base['publications']))
         st.text(base['citedby'])
         st.dataframe(tabela)
