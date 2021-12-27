@@ -1,4 +1,3 @@
-from sslproxies import get_proxy
 import requests
 from lxml import etree
 from bs4 import BeautifulSoup
@@ -27,7 +26,6 @@ import unicodedata
 import json
 import pandas as pd
 import time
-from scholarly import ProxyGenerator
 
 @st.cache()
 def busca(autor):
