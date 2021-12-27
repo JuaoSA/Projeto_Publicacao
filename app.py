@@ -32,9 +32,6 @@ from scholarly import ProxyGenerator
 @st.cache()
 def busca(autor):
     dados = []
-    pg = ProxyGenerator()
-    pg.FreeProxies()
-    scholarly.use_proxy(pg)
     search_query = scholarly.search_author(autor)
     for x in search_query:
         dados.append(scholarly.fill(x, sections=['basics', 'indices',
