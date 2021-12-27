@@ -148,7 +148,7 @@ def busca_autor_semantic(position, dados):
         match = process.extract(if_contains_t, titulo,
                                 scorer=fuzz.token_sort_ratio)
     for x in range(len(match)):
-        if match[x][1] >= 90:
+        if match[x][1] >= 100:
             for y in range(len(data['data'][x]['authors'])):
                 nome.append(data['data'][x]['authors'][y]['name'])
             match2 = process.extractOne(if_contains_aut, nome,
