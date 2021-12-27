@@ -1,5 +1,4 @@
-
-
+from sslproxies import get_proxy
 import requests
 from lxml import etree
 from bs4 import BeautifulSoup
@@ -49,10 +48,15 @@ def busca_index(autor, dados):
 
 def busca_data(id_autor, id_obra):
     dados = []
+    proxy = get_proxy()
+    session = requests.Session()
+    session.proxies = {
+        'http': str(proxy.ip_and_port),
+    }
     URL = \
         'https://scholar.google.com.br/citations?view_op=view_citation&hl=pt-BR&user=' \
         + id_autor + '&citation_for_view=' + id_obra
-    response = requests.get(URL)
+    response = session.get(URL)
     soup = BeautifulSoup(response.content, 'lxml')
     selector = soup.find_all('div', class_='gsc_oci_field')
     reviews_selector = soup.find_all('div', class_='gsc_oci_value')
@@ -69,12 +73,17 @@ def busca_data(id_autor, id_obra):
 
 
 def busca_veiculo(id_autor, id_obra):
+    proxy = get_proxy()
+    session = requests.Session()
+    session.proxies = {
+        'http': str(proxy.ip_and_port),
+    }
     dados = []
     URL = \
         'https://scholar.google.com.br/citations?view_op=view_citation&hl=pt-BR&user=' \
         + id_autor + '&citation_for_view=' + id_obra
 
-    response = requests.get(URL)
+    response = session.get(URL)
     soup = BeautifulSoup(response.content, 'lxml')
     selector = soup.find_all('div', class_='gsc_oci_field')
     reviews_selector = soup.find_all('div', class_='gsc_oci_value')
