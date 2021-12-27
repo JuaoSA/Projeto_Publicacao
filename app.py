@@ -645,7 +645,7 @@ def main():
         base = insere_dados(res, dados)
         tabela = gera_ontologia(base)
         st.title(base['name'])
-        st.text('Afiliação:)
+        st.text('Afiliação:')
         st.text(base['affiliation'])
         st.text('Interesses: ')
         st.text(base['interests'])
