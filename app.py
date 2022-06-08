@@ -21,13 +21,14 @@ import json
 from bs4 import BeautifulSoup
 from scholarly import scholarly
 
+@st.cache()
 def buscaScholar(autor):
   dados = []
   search_query = scholarly.search_author(autor)
   for x in search_query:
       dados.append(scholarly.fill(x, sections=['basics', 'indices','publications']))
   return dados
-
+@st.cache()
 def buscaInfo(autor,posicao):
   date = datetime.date.today()
   year = int(date.strftime("%Y")) - 5
