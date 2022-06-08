@@ -21,7 +21,6 @@ import json
 from bs4 import BeautifulSoup
 from scholarly import scholarly
 
-@st.cache()
 def buscaScholar(autor):
   dados = []
   search_query = scholarly.search_author(autor)
