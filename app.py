@@ -1,245 +1,217 @@
-import requests
-from lxml import etree
-from bs4 import BeautifulSoup
-import streamlit as st
-import numpy as np
-from scholarly import scholarly
-import subprocess
-import sys
-import semanticscholar as sch
+import datetime
 import re
-import time
-from fuzzywuzzy import process
-from fuzzywuzzy import fuzz
-import texthero as hero
-from texthero import preprocessing
 import rdflib
 from rdflib.graph import Graph
 from rdflib import URIRef, BNode, Literal
 from rdflib import Namespace
-from rdflib.namespace import CSVW, DC, DCAT, DCTERMS, DOAP, FOAF, ODRL2, ORG, OWL, PROF, PROV, RDF, RDFS, SDO, SH, SKOS, \
-    SOSA, SSN, TIME, VOID, XMLNS, XSD
+from rdflib.namespace import CSVW, DC, DCAT, DCTERMS, DOAP, FOAF, ODRL2, ORG, OWL, PROF, PROV, RDF, RDFS, SDO, SH, SKOS, SOSA, SSN, TIME, VOID, XMLNS, XSD
 from rdflib.plugins import sparql
 import owlrl
 from SPARQLWrapper import SPARQLWrapper, JSON, XML, N3, TURTLE, JSONLD
 import unicodedata
+from texthero import preprocessing
+import texthero as hero
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+import pandas
+from difflib import SequenceMatcher
+from semanticscholar import SemanticScholar
+import requests
 import json
-import pandas as pd
-import time
+from bs4 import BeautifulSoup
+from scholarly import scholarly
 
 @st.cache()
-def busca(autor):
-    dados = []
-    search_query = scholarly.search_author(autor)
-    for x in search_query:
-        dados.append(scholarly.fill(x, sections=['basics', 'indices',
-                                                 'publications']))
-    return dados
+def buscaScholar(autor):
+  dados = []
+  search_query = scholarly.search_author(autor)
+  for x in search_query:
+      dados.append(scholarly.fill(x, sections=['basics', 'indices','publications']))
+  return dados
 
+def buscaInfo(autor,posicao):
+  date = datetime.date.today()
+  year = int(date.strftime("%Y")) - 5
+  autor_dados = scholarly.fill(autor[posicao])
+  publicacoes = autor_dados['publications']
+  informacoes = autor_dados
+  publi= [] 
+  for p in publicacoes:
+    if not 'pub_year' in  p['bib']:
+          p['bib']['pub_year'] = '0000'
+    if int(p['bib']['pub_year']) >= year: 
+      publi.append(scholarly.fill(p))
 
-@st.cache()
-def busca_index(autor, dados):
-    for sub in range(len(dados)):
-        if dados[sub]['name'] == autor:
-            return sub
-
-
-def busca_data(id_autor, id_obra):
-    dados = []
-
-    URL = \
-        'https://scholar.google.com.br/citations?view_op=view_citation&hl=pt-BR&user=' \
-        + id_autor + '&citation_for_view=' + id_obra
-    response = requests.get(URL)
-    soup = BeautifulSoup(response.content, 'lxml')
-    selector = soup.find_all('div', class_='gsc_oci_field')
-    reviews_selector = soup.find_all('div', class_='gsc_oci_value')
-    try:
-        x = re.search("^(\d{4})", reviews_selector[1].text)
-        if x:
-            y = re.search("^(\d{4})", reviews_selector[1].text)
-            dados.append(y.group())
+  Autor_Info = {
+ 'nome' : informacoes['name'] ,
+ 'afilicao' : informacoes['affiliation'],
+ 'interesse' : informacoes['interests'],
+ 'hindex' : informacoes['hindex'] ,
+ 'i10' : informacoes['i10index'] ,
+ 'citado' : informacoes['citedby'] ,
+ 'publicacao' : [] ,
+  }
+  for x in publi:
+    if "journal" in x['bib']:
+        if 'pub_year' in  x['bib']:
+          ano  = x['bib']['pub_year']
         else:
-            dados.append('NAN')
-    except:
-        dados.append('NAN')
-    return dados
+          ano = '0000'  
+        Autor_Info['publicacao'].append({
+                  'title':  x['bib']['title'],
+                  'pub_year': ano ,
+                  'tipo_publi': 'journal'  ,
+                  'veiculo':  x['bib']['journal'],})
 
-
-def busca_veiculo(id_autor, id_obra):
-
-    dados = []
-    URL = \
-        'https://scholar.google.com.br/citations?view_op=view_citation&hl=pt-BR&user=' \
-        + id_autor + '&citation_for_view=' + id_obra
-
-    response = requests.get(URL)
-    soup = BeautifulSoup(response.content, 'lxml')
-    selector = soup.find_all('div', class_='gsc_oci_field')
-    reviews_selector = soup.find_all('div', class_='gsc_oci_value')
-
-    try:
-        tipo = selector[2].text
-        if tipo == 'Publicações' or tipo == 'Fonte' or tipo == 'Editora' or tipo == 'Livro' or tipo == 'Fonte' or tipo == 'Conferência':
-            dados.append(tipo)
-            dados.append(reviews_selector[2].text)
+    if "conference" in x['bib']:
+        if 'pub_year' in  x['bib']:
+          ano  = x['bib']['pub_year']
         else:
-            dados.append('NAN')
-            dados.append('NAN')
-    except:
-        dados.append('NAN')
-        dados.append('NAN')
-    return dados
+          ano = '0000'  
+        Autor_Info['publicacao'].append({
+                  'title':  x['bib']['title'],
+                  'pub_year': ano ,
+                  'tipo_publi': 'conference'  ,
+                  'veiculo':  x['bib']['conference'],})
 
-
-def insere_dados_autor(posicao, dados):
-    Autor = {}
-    Autor = {
-        'name': dados[posicao]['name'],
-        'interests': dados[posicao]['interests'],
-        'affiliation': dados[posicao]['affiliation'],
-        'citedby': dados[posicao]['citedby'],
-        'scholar_id': dados[posicao]['scholar_id'],
-        'hindex': dados[posicao]['hindex'],
-        'i10index': dados[posicao]['i10index'],
-        'publications': [],
-    }
-    for x in range(len(dados[posicao]['publications'])):
-
-        autor = dados[posicao]['scholar_id']
-        obra = dados[posicao]['publications'][x]['author_pub_id']
-        if len(dados[posicao]['publications'][x]['bib']) <= 1:
-            data = busca_data(autor, obra)
-            veiculo = busca_veiculo(autor, obra)
-            Autor['publications'].append({
-                'author_pub_id': obra,
-                'title': dados[posicao]['publications'][x]['bib']['title'],
-                'pub_year': data[0],
-                'tipo_publi': veiculo[0],
-                'veiculo': veiculo[1],
-            })
+    if "Book" in x['bib']:
+        if 'pub_year' in  x['bib']:
+          ano  = x['bib']['pub_year']
         else:
+          ano = '0000'
+        Autor_Info['publicacao'].append({
+                  'title':  x['bib']['title'],
+                  'pub_year':  ano ,
+                  'tipo_publi': 'Book'  ,
+                  'veiculo':  x['bib']['Book'],})
 
-            veiculo = busca_veiculo(autor, obra)
+    if "volume" in x['bib']:
+        if 'pub_year' in  x['bib']:
+          ano  = x['bib']['pub_year']
+        else:
+          ano = '0000'
+        Autor_Info['publicacao'].append({
+                  'title':  x['bib']['title'],
+                  'pub_year':  ano ,
+                  'tipo_publi': 'volume'  ,
+                  'veiculo':  x['bib']['volume'],})
+        
+  for t in Autor_Info['publicacao']:
+    if t['veiculo'].isdigit() == True:
+      del(Autor_Info['publicacao'][Autor_Info['publicacao'].index(t)])
+  del informacoes["publications"]
 
-            Autor['publications'].append({
-                'author_pub_id': obra,
-                'title': dados[posicao]['publications'][x]['bib']['title'],
-                'pub_year': dados[posicao]['publications'][x]['bib']['pub_year'],
-                'tipo_publi': veiculo[0],
-                'veiculo': veiculo[1],
-            })
-    return Autor
+  return Autor_Info
 
+def buscaSemantic(Autor_Info):
+    titulos = []
+    sch = SemanticScholar(timeout=5)
+    for t in Autor_Info['publicacao']:
+        if_contains_t = t['title']
+        headers = {'Accept': 'application/json'}
+        r = \
+            requests.get('https://api.semanticscholar.org/graph/v1/paper/search?query='
+                          + if_contains_t + '&fields=title,authors',
+                         headers=headers)
+        data = r.json()
+        #if data['total'] >= 1:
+        for x in data['data'][0]['authors']:
+                    result = SequenceMatcher(None, x['name'],
+                            Autor_Info['nome']).ratio()
+                    if result > 0.6:
+                        semantic_dados = sch.author(x['authorId'])
+        
+                        for t in Autor_Info['publicacao']:
+                            titulos.append(t['title'].lower())
 
-def busca_autor_semantic(position, dados):
-    if_contains_t = dados[position]['publications'][position]['bib']['title']
-    url = requests.get(
-        "https://api.semanticscholar.org/graph/v1/paper/search?query=" + if_contains_t + "&fields=title,authors")
-    text = url.text
-    data = json.loads(text)
-    titulo = []
-    nome = []
-    if_contains_aut = dados[position]['name']
+                        for t in semantic_dados['papers']:
+                            match = process.extract(t['title'].lower(), titulos,
+                                                    scorer=fuzz.token_sort_ratio)
+                            if match[0][1] < 60:
+                                paperid = str(t['paperId'])
+                                paper = sch.paper(paperid)
+                                Autor_Info['publicacao'].append({'title': paper['title'],
+                                        'pub_year': paper['year'], 'veiculo': paper['venue'
+                                        ]})
+                                
+                    return Autor_Info
+                    break
+def qualis (Autor_Info):
 
-    for t in range(len(data['data'])):
-        titulo.append(data['data'][t]['title'])
-        match = process.extract(if_contains_t, titulo,
-                                scorer=fuzz.token_sort_ratio)
-    for x in range(len(match)):
-        if match[x][1] >= 100:
-            for y in range(len(data['data'][x]['authors'])):
-                nome.append(data['data'][x]['authors'][y]['name'])
-            match2 = process.extractOne(if_contains_aut, nome,
-                                        scorer=fuzz.token_sort_ratio)
-            id = data['data'][x]['authors'][y]['authorId']
+  _pr = pandas.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRqi1UUf_cTEj1B4VWMCHk3fhzcMQgsyH3jSox1m-G6CuOuUniUuLc8GK6yjMY4CnUWZd_V77sCuYut/pub?output=csv')
+  _pr['Área de Avaliação'] = _pr['Área de Avaliação'].str.strip()
+  _pr['Área de Avaliação'].tolist()
+  _pr['Estrato'] = _pr['Estrato'].str.strip()
+  _pr['Estrato'].tolist()
+  
+  pr = _pr.loc[_pr['Área de Avaliação'].values == 'CIÊNCIA DA COMPUTAÇÃO'] 
+  pr = pr.reset_index(drop=True)
 
-        return sch.author(id, timeout=2)
-
-
-def insere_dados(posicao, dados):
-    autor_G = insere_dados_autor(posicao, dados)
-    autor_S = busca_autor_semantic(posicao, dados)
-    base_principal = autor_G
-    d1 = []
-    for x in range(len(dados[posicao]['publications'])):
-        d1.append(dados[posicao]['publications'][x]['bib']['title'])
-    d2 = []
-    for x in range(len(autor_S['papers'])):
-        d2.append(autor_S['papers'][x]['title'])
-    match = []
-    match2 = []
-    for i in d2:
-        match2.append(process.extractOne(i, d1,
-                                         scorer=fuzz.token_sort_ratio))
-    for x in range(len(match2)):
-        if match2[x][1] >= 100:
-            paperid = str(autor_S['papers'][x]['paperId'])
-            paper = sch.paper(paperid)
-            base_principal['publications'].append({
-                'author_pub_id': paper['paperId'],
-                'title': paper['title'],
-                'pub_year': paper['year'],
-                'veiculo': paper['venue'],
-            })
-
-    periodicos_link = \
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTeZuJpry8wjDWn5KBMmWpl0JAEh20SQXZ8SUzswKpwEUHuFB4-4vKIsY238K4uNJga3bRChPIKYTka/pubhtml'
-    res = requests.get(periodicos_link)
-    soup = BeautifulSoup(res.content, 'lxml')
-    periodicos = pd.read_html(str(soup))
-    d = {'inss': periodicos[0]['Unnamed: 1'],
-         'periodicos': periodicos[0]['Unnamed: 2'],
-         'Qualis_Final': periodicos[0]['Unnamed: 6']}
-    pr = pd.DataFrame(data=d)
-
-    conferencia_link = \
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZsntDnttAWGHA8NZRvdvK5A_FgOAQ_tPMzP7UUf-CHwF_3PHMj_TImyXN2Q_Tmcqm2MqVknpHPoT2/pubhtml?gid=0&single=true'
-    res = requests.get(conferencia_link)
-    soup = BeautifulSoup(res.content, 'lxml')
-    conferencias = pd.read_html(str(soup))
-    c = {'sigla': conferencias[0]['Unnamed: 1'],
-         'conferencia': conferencias[0]['Unnamed: 2'],
-         'Qualis_Final': conferencias[0]['Unnamed: 7']}
-    cn = pd.DataFrame(data=c)
-
-    cn = pd.DataFrame(data=c).dropna()
-    pr = pd.DataFrame(data=d).dropna()
-
-    cn = cn.drop(0)
-    pr = pr.drop(0)
-    custom_pipeline = [preprocessing.fillna, preprocessing.lowercase,
-                       preprocessing.remove_whitespace,
-                       preprocessing.remove_punctuation]
-    cn['conferencia_limpo'] = hero.clean(cn['conferencia'],
-                                         custom_pipeline)
-    pr['periodicos_limpo'] = hero.clean(pr['periodicos'],
-                                        custom_pipeline)
-
-    for i in base_principal['publications']:
-        peri = process.extractOne(str(i['veiculo']),
-                                  pr['periodicos'],
-                                  scorer=fuzz.token_sort_ratio)
-        if peri[1] >= 90:
-            i['Qualis'] = str(pr['Qualis_Final'].values[peri[2]])
-            i[' veiculo'] = str(pr['periodicos'].values[peri[2]])
-            i['inss'] = str(pr['inss'].values[peri[2]])
-            i['tipo_evento'] = 'periodico'
-
-    for i in base_principal['publications']:
-        conf = process.extractOne(str(i['veiculo']),
-                                  cn['conferencia'],
-                                  scorer=fuzz.token_sort_ratio)
-        if conf[1] >= 90:
-            i['Qualis'] = str(cn['Qualis_Final'].values[conf[2]])
-            i[' veiculo'] = str(cn['conferencia'].values[conf[2]])
-            i['sigla'] = str(cn['sigla'].values[conf[2]])
-            i['tipo_evento'] = 'conferencia'
-
-    return base_principal
+  cn = pandas.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vT7FcK0i4UN6ULcLFlEa7FO2E0vemz-9VfIwEtaOW6PnP4eAzCyzJ1BPwtATk0ZKUKVBvHaT5Mx2TBV/pub?output=csv')
 
 
+
+
+
+
+
+  #conferencia_link = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZsntDnttAWGHA8NZRvdvK5A_FgOAQ_tPMzP7UUf-CHwF_3PHMj_TImyXN2Q_Tmcqm2MqVknpHPoT2/pubhtml?gid=0&single=true'
+  #res = requests.get(conferencia_link)
+  #soup = BeautifulSoup(res.content, 'lxml')
+  #conferencias = pandas.read_html(str(soup))
+  #c = {'sigla': conferencias[0]['Unnamed: 1'],
+      #    'conferencia': conferencias[0]['Unnamed: 2'],
+       #   'Qualis_Final': conferencias[0]['Unnamed: 7']}
+  #cn = pandas.DataFrame(data=c)
+
+  #cn = pandas.DataFrame(data=c).dropna()
+
+  #cn = cn.drop(0)
+ # pr = pr.drop(0)
+
+  custom_pipeline = [preprocessing.fillna, 
+                        preprocessing.lowercase,
+                        preprocessing.remove_whitespace,
+                        preprocessing.remove_punctuation]
+  cn['conferencia_limpo'] = hero.clean(cn['conferencia'],
+              custom_pipeline)
+  pr['periodicos_limpo'] = hero.clean(pr['Título'],
+              custom_pipeline)
+
+  con = cn['conferencia_limpo'].values.tolist()
+  per = pr['periodicos_limpo'].values.tolist()
+
+  for i in Autor_Info['publicacao']:
+
+          
+          peri = process.extractOne(i['veiculo'],
+                                   pr['periodicos_limpo'],
+                                    scorer=fuzz.token_set_ratio)
+          conf = process.extractOne(i['veiculo'],
+                                    cn['conferencia_limpo'],
+                                    scorer=fuzz.token_set_ratio)
+
+          
+          if peri[1] > conf[1] : 
+            if peri[1] >= 95:
+                df_mask=pr['periodicos_limpo'] == str(peri[0])
+                filtered_df = pr[df_mask]
+                i['Qualis'] = str(filtered_df.iat[0,3])
+                #i['veiculo'] = str(filtered_df.iat[0,1])
+                i['inss'] = str(filtered_df.iat[0,0])
+                i['tipo_evento'] = 'periodico'
+          else:
+            if conf[1] >= 95:
+              df_mask=cn['conferencia_limpo'] == str(conf[0])
+              filtered_df = cn[df_mask]
+              i['Qualis'] = str(filtered_df.iat[0,6])
+              #i['veiculo'] = str(filtered_df.iat[0,3])
+              i['sigla'] = str(filtered_df.iat[0,0])
+              i['tipo_evento'] = 'conferencia'
+
+  return Autor_Info  
 def clear_char(palavra):
+
     # Unicode normalize transforma um caracter em seu equivalente em latin.
     nfkd = unicodedata.normalize('NFKD', palavra)
     palavraSemAcento = u"".join([c for c in nfkd if not unicodedata.combining(c)])
@@ -249,14 +221,16 @@ def clear_char(palavra):
 
 
 def gera_ontologia(base_principal):
-    dic = {}
-    p = []
-    e = []
-    g = Graph()
-    n3data = """@prefix : <http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#> .
+  date = datetime.date.today()
+  year = str(int(date.strftime("%Y")) - 5) 
+  dic={}
+  p = []
+  e= []
+  g = Graph()
+  n3data = """@prefix : <http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#> .
   @prefix owl: <http://www.w3.org/2002/07/owl#> .
   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-  @prefix xml: <http://www.w3.org/XML/1998/namespace> .
+  @prefix xml: <http://www.w3.org/XML/1998/nomespace> .
   @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
   @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
   @base <http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao> .
@@ -429,7 +403,7 @@ def gera_ontologia(base_principal):
   #################################################################
 
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A1
-  :A1 rdf:type owl:NamedIndividual ,
+  :A1 rdf:type owl:nomedIndividual ,
               :Qualis ;
       :Qualis_Extrato "A1" .
 
@@ -486,174 +460,204 @@ def gera_ontologia(base_principal):
 
 
   """
+  
+  ontologia = g.parse(data=n3data, format='ttl')
+  pp  = Namespace("http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#")#iri
+  g.bind("pp", pp )
+  nome_autor = base_principal['nome']
+  Interesses_autor = base_principal['interesse']
+  Afiliação_autor = base_principal['afilicao']
+  nome_autor_limpo = re.sub('[,|\s]+', '_', clear_char(nome_autor))
+  Afiliacao_autor_limpo = re.sub('[,|\s]+', '_', clear_char(Afiliação_autor))
 
-    ontologia = g.parse(data=n3data, format='ttl')
-    pp = Namespace("http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#")  # iri
-    g.bind("pp", pp)
-    nome_autor = base_principal['name']
-    Interesses_autor = base_principal['interests']
-    Afiliacao_autor = base_principal['affiliation']
-    nome_autor_limpo = re.sub('[,|\s]+', '_', clear_char(nome_autor))
-    Afiliacao_autor_limpo = re.sub('[,|\s]+', '_', clear_char(Afiliacao_autor))
+  #dados do autor 
+  g.add((pp[nome_autor_limpo], RDF.type, pp.Autor_Cientifico))
+  g.add((pp[nome_autor_limpo], pp.Nome_Autor, Literal(base_principal['nome'])))
+  g.add((pp[nome_autor_limpo], pp.Autor_Citacao, Literal(base_principal['citado'])))
+  g.add((pp[nome_autor_limpo], pp.Autor_IndiceH, Literal(base_principal['hindex'])))
+  g.add((pp[nome_autor_limpo], pp.Autor_indiceI10, Literal(base_principal['i10'])))
 
-    # dados do autor
-    g.add((pp[nome_autor_limpo], RDF.type, pp.Autor_Cientifico))
-    g.add((pp[nome_autor_limpo], pp.Nome_Autor, Literal(base_principal['name'])))
-    g.add((pp[nome_autor_limpo], pp.Autor_Citacao, Literal(base_principal['citedby'])))
-    g.add((pp[nome_autor_limpo], pp.Autor_IndiceH, Literal(base_principal['hindex'])))
-    g.add((pp[nome_autor_limpo], pp.Autor_indiceI10, Literal(base_principal['i10index'])))
 
-    g.add((pp[Afiliacao_autor_limpo], RDF.type, pp.Instituicao))
-    g.add((pp[Afiliacao_autor_limpo], pp.Instituicao, Literal(Afiliacao_autor)))
+  g.add((pp[Afiliacao_autor_limpo], RDF.type, pp.Instituicao))
+  g.add((pp[Afiliacao_autor_limpo], pp.Instituicao, Literal(Afiliação_autor)))
 
-    g.add((pp[nome_autor_limpo], pp.Afiliado, pp[Afiliacao_autor_limpo]))
+  g.add((pp[nome_autor_limpo], pp.Afiliado, pp[Afiliacao_autor_limpo]))
 
-    # area de interesse
-    for x in Interesses_autor:
-        area = re.sub('[,|\s]+', '_', clear_char(x))
+  #area de interesse
+  for x in Interesses_autor:
+      area = re.sub('[,|\s]+', '_', clear_char(x))
 
-        g.add((pp[area], RDF.type, pp.Area_Pesquisa))
-        g.add((pp[area], pp.Area_Pesquisa, Literal(x)))
-        g.add((pp[nome_autor_limpo], pp.Pesquisa, pp[area]))
+      g.add((pp[area], RDF.type, pp.Area_Pesquisa))
+      g.add((pp[area], pp.Area_Pesquisa, Literal(x)))
+      g.add((pp[nome_autor_limpo], pp.Pesquisa, pp[area]))
 
-    # publicacao
-    for x in range(len(base_principal['publications'])):
+  #publicacao
 
-        titulo = base_principal['publications'][x]['title']
-        titulo_clean = re.sub('[,|\s]+', '_', clear_char(titulo))
-        veiculo = base_principal['publications'][x]['veiculo']
-        veiculo_clean = re.sub('[,|\s]+', '_', clear_char(veiculo))
-        autoria = nome_autor_limpo + '_Autoria_' + str(x)
-        publicacao = nome_autor_limpo + '_Publicacao_' + str(x)
-
-        # Cria Autoria
-        g.add((pp[autoria], RDF.type, pp.Autoria_Cientifica))
-        g.add((pp[nome_autor_limpo], pp.Detem, pp[autoria]))
-
-        # Cria Artigo
-        g.add((pp[titulo_clean], RDF.type, pp.Texto_Autoral_Cientifico_Publicado))
-        g.add((pp[titulo_clean], pp.Titulo_Artigo, Literal(titulo)))
-
-        g.add((pp[autoria], pp.Refere_se, pp[titulo_clean]))
-        # Cria Publicacao
-        g.add((pp[publicacao], RDF.type, pp.Publicacao))
-        g.add((pp[titulo_clean], pp.Submetido, pp[publicacao]))
-        g.add((pp[veiculo_clean], RDF.type, pp.Veiculo))
-        g.add((pp[veiculo_clean], pp.Edicao_Ano, Literal(base_principal['publications'][x]['pub_year'])))
-        g.add((pp[veiculo_clean], pp.Edicao_Nome, Literal(veiculo)))
-        g.add((pp[publicacao], pp.Publicado_em, pp[veiculo_clean]))
-
-        if 'Qualis' in base_principal['publications'][x]:
-            qualis = base_principal['publications'][x]['Qualis']
-            # qualis_clear = re.sub('[,|\s]+', '_', clear_char(qualis))
-            g.add((pp[veiculo_clean], pp.Classificada, pp[qualis]))
-            g.add((pp[veiculo_clean], pp.Edicao_Tipo, Literal(base_principal['publications'][x]['tipo_evento'])))
-
-    # g.serialize(data = ontologia, format='turtle')
-    qres = g.query(
-        """SELECT ?titulo ?q ?evento ?tipo
-        WHERE
-          { 
-            ?x pp:Refere_se ?artigo.  
-            ?artigo pp:Submetido ?y;
-                pp:Titulo_Artigo ?titulo.
-            ?y pp:Publicado_em  ?z.
-            ?z  a pp:Veiculo;
-                pp:Edicao_Nome ?evento;
-                pp:Edicao_Tipo ?tipo. 
-            ?z pp:Classificada ?qualis.
-            ?qualis  a pp:Qualis;
-                pp:Qualis_Extrato ?q.
+      
     
-    
-            }""")
-    # Colocar filtro por nome.
-    for row in qres:
+  for x in range(len(base_principal['publicacao'])):
+      titulo = base_principal['publicacao'][x]['title']
+      titulo_clean = re.sub('[,|\s]+', '_', clear_char(titulo))
+      veiculo =  base_principal['publicacao'][x]['veiculo']
+      veiculo_clean = re.sub('[,|\s]+', '_', clear_char( veiculo))
+      autoria = nome_autor_limpo +'_Autoria_'+str(x)
+      publicacao = nome_autor_limpo +'_Publicacao_'+str(x)
+     
+      #Cria Autoria 
+      g.add((pp[autoria], RDF.type, pp.Autoria_Cientifica))
+      g.add((pp[nome_autor_limpo], pp.Detem, pp[autoria]))
+      
+      #Cria Artigo
+      g.add((pp[titulo_clean], RDF.type, pp.Texto_Autoral_Cientifico_Publicado))
+      g.add((pp[titulo_clean], pp.Titulo_Artigo, Literal(titulo)))
+
+      g.add((pp[autoria], pp.Refere_se, pp[titulo_clean]))
+      #Cria Publicacao 
+      g.add((pp[publicacao], RDF.type, pp.Publicacao))
+      g.add((pp[titulo_clean], pp.Submetido, pp[publicacao]))
+      g.add((pp[veiculo_clean], RDF.type, pp.Veiculo))
+      g.add((pp[veiculo_clean], pp.Edicao_Ano, Literal(base_principal['publicacao'][x]['pub_year'])))
+      g.add((pp[veiculo_clean], pp.Edicao_Nome, Literal(veiculo)))
+      g.add((pp[publicacao], pp.Publicado_em , pp[veiculo_clean]))  
+
+
+      if 'Qualis' in base_principal['publicacao'][x]:
+          qualis = base_principal['publicacao'][x]['Qualis']
+          #qualis_clear = re.sub('[,|\s]+', '_', clear_char(qualis))
+          g.add((pp[veiculo_clean], pp.Classificada, pp[qualis]))
+          g.add((pp[veiculo_clean], pp.Edicao_Tipo, Literal(base_principal['publicacao'][x]['tipo_publi'])))
+      else: 
+          #g.add((pp[veiculo_clean], pp.Classificada, pp["C"]))
+          g.add((pp[veiculo_clean], pp.Edicao_Tipo, Literal('Não Especificado')))
+
+
+  #g.serialize(data = ontologia, format='turtle')
+  qres = g.query(
+    """SELECT ?titulo ?q ?evento ?tipo
+      WHERE
+        { 
+         ?artigo a pp:Texto_Autoral_Cientifico_Publicado;
+              pp:Titulo_Artigo ?titulo.
+         ?artigo pp:Submetido ?y.
+          ?y pp:Publicado_em ?evento.
+          ?evento  pp:Edicao_Tipo ?tipo.
+          ?evento  pp:Edicao_Ano ?data.
+            FILTER (?data >= """+year+""")
+          ?evento pp:Classificada ?qualis.
+         ?qualis pp:Qualis_Extrato ?q.
+         }""")
+  
+  #Colocar filtro por nome.
+  #SELECT ?titulo ?q ?evento ?tipo
+      #WHERE
+        #{ 
+        # ?artigo a pp:Texto_Autoral_Cientifico_Publicado;
+          #    pp:Titulo_Artigo ?titulo.
+        # ?artigo pp:Submetido ?y.
+          #?y pp:Publicado_em ?evento.
+          #?evento  pp:Edicao_Tipo ?tipo.  
+          #?evento pp:Classificada ?qualis.
+        # ?qualis pp:Qualis_Extrato ?q.}
+
+  for row in qres:
         d = {
-            'titulo': re.search("([^']*)", str(row.titulo)).string,
-            'evento': re.search("([^']*)", str(row.evento)).string,
-            'tipo': re.search("([^']*)", str(row.tipo)).string,
-            'Qualis': re.search("([^']*)", str(row.q)).string, }
+        'Titulo' : re.search("([^']*)",str(row.titulo)).string,
+        'Evento': re.search("([^']*)",str(row.evento)).string,
+        'Tipo' : re.search("([^']*)",str(row.tipo)).string,
+        'Qualis': re.search("([^']*)",str(row.q)).string,}
         p.append(d)
-    for x in range(len(p)):
-        if p[x]['tipo'] == 'periodico':
-            if p[x]['Qualis'] == 'A1':
-                p[x]['Pontuacao'] = 1.000
+  for x in range(len(p)):
+        if p[x]['Tipo'] == 'journal' :
+            if  p[x]['Qualis'] == 'A1':
+                p[x][ 'Pontuação'] = 1.000
 
             if p[x]['Qualis'] == 'A2':
-                p[x]['Pontuacao'] = 0.875
+                p[x][ 'Pontuação'] =  0.875
 
             if p[x]['Qualis'] == 'A3':
-                p[x]['Pontuacao'] = 0.750
+                p[x][ 'Pontuação'] = 0.750
 
             if p[x]['Qualis'] == 'A4':
-                p[x]['Pontuacao'] = 0.625
+                p[x][ 'Pontuação'] =  0.625
 
             if p[x]['Qualis'] == 'B1':
-                p[x]['Pontuacao'] = 0.500
+                p[x][ 'Pontuação'] =  0.500
 
             if p[x]['Qualis'] == 'B2':
-                p[x]['Pontuacao'] = 0.200
+                p[x][ 'Pontuação'] = 0.200
 
             if p[x]['Qualis'] == 'B3':
-                d['Pontuacao'] = 0.100
+                d[ 'Pontuação'] =  0.100
 
             if p[x]['Qualis'] == 'B4':
-                p[x]['Pontuacao'] = 0.050
-        if p[x]['tipo'] == 'conferencia':
+                p[x][ 'Pontuação'] =  0.050
+            if p[x]['Qualis'] == 'C':
+                p[x][ 'Pontuação'] =  0.000   
+        if p[x]['Tipo'] == 'conference':
             if p[x]['Qualis'] == 'A1':
-                p[x]['Pontuacao'] = 1.000
-
+                p[x][ 'Pontuação'] = 1.000
+              
             if p[x]['Qualis'] == 'A2':
-                p[x]['Pontuacao'] = 0.875
+                p[x][ 'Pontuação'] =  0.875
 
             if p[x]['Qualis'] == 'A3':
-                p[x]['Pontuacao'] = 0.750
+                p[x][ 'Pontuação'] = 0.750
 
             if p[x]['Qualis'] == 'A4':
-                p[x]['Pontuacao'] = 0.625
+                p[x][ 'Pontuação'] =  0.625
 
             if p[x]['Qualis'] == 'B1':
-                p[x]['Pontuacao'] = 0.500
+                p[x][ 'Pontuação'] =  0.500
 
             if p[x]['Qualis'] == 'B2':
-                p[x]['Pontuacao'] = 0.200
+                p[x][ 'Pontuação'] = 0.200
 
             if p[x]['Qualis'] == 'B3':
-                p[x]['Pontuacao'] = 0.100
+                p[x][ 'Pontuação'] = 0.100
 
             if p[x]['Qualis'] == 'B4':
-                p[x]['Pontuacao'] = 0.050
+                p[x][ 'Pontuação'] =  0.050
+            if p[x]['Qualis'] == 'C':
+                p[x][ 'Pontuação'] =  0.000   
 
-    data_qualis = pd.DataFrame(data=p)
-    return data_qualis
+  data_qualis = pandas.DataFrame(data=p)
+  s = g.serialize(format='turtle')
 
+  return data_qualis   
+def Executa():
+  autor= []
+  autor_name = []
+  st.set_page_config(layout="wide")
+
+  Autor = st.text_input(label='Nome do Pesquisador')
+  autor = buscaScholar(Autor)
+  for x in range(len(autor)):
+    autor_name.append(autor[x]['name'])
+  escolha = st.selectbox('Pesquisadores', autor_name)  
+  if st.button(label='Buscar'):
+    i = autor_name.index(escolha)
+    info = buscaInfo(autor,i)
+    semantic = buscaSemantic(info)
+    base_principal = qualis(semantic)
+    tabela = gera_ontologia(base_principal)
+    my_form_3 = st.form(key = "form3")
+    my_form_3.write(base_principal['nome'])
+    my_form_3.write('Afiliação')
+    my_form_3.write(base_principal['afilicao'])
+    my_form_3.write('Interesses')
+    my_form_3.write(base_principal['interesse'])
+    my_form_3.write('Total Publicações' )
+    my_form_3.write(len(base_principal['publicacao']))
+    my_form_3.write('Citado por ')
+    my_form_3.write( base_principal['citado'])
+    my_form_3.write('i10')
+    my_form_3.write(base_principal['i10'])
+    my_form_3.write('hindex')
+    my_form_3.write(base_principal['hindex'])
+    my_form_3.write('Soma da Pontuação qualis')
+    my_form_3.write(tabela["Pontuação"].sum())
+    my_form_3.table(tabela)         
 
 def main():
-    dados = []
-    autor_name = []
-    st.title('Ontologia de Publicacao')
-
-    selected = st.sidebar.text_input('', 'Nome Autor')
-    dados = busca(selected)
-    for x in range(len(dados)):
-        autor_name.append(dados[x]['name'])
-    escolha = st.sidebar.selectbox('Autores', autor_name)
-    if st.sidebar.button('Buscar'):
-        res = busca_index(escolha, dados)
-        base = insere_dados(res, dados)
-        tabela = gera_ontologia(base)
-        st.header(base['name'])
-        st.header('Afiliação:')
-        st.subheader(base['affiliation'])
-        st.header('Interesses: ')
-        st.subheader(base['interests'])
-        st.header('Total Publicações: ')
-        st.subheader(len(base['publications']))
-        st.header('Citado por: ')
-        st.subheader(base['citedby'])
-
-        st.dataframe(tabela)
-
-
-main()
+  Executa()
+main()      
