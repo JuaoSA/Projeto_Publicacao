@@ -21,6 +21,7 @@ import json
 from bs4 import BeautifulSoup
 from scholarly import scholarly
 
+@st.cache()
 def buscaScholar(autor):
   dados = []
   search_query = scholarly.search_author(autor)
@@ -638,24 +639,9 @@ def Executa():
     semantic = buscaSemantic(info)
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
-    my_form_3 = st.form(key = "form3")
-    my_form_3.write(base_principal['nome'])
-    my_form_3.write('Afiliação')
-    my_form_3.write(base_principal['afilicao'])
-    my_form_3.write('Interesses')
-    my_form_3.write(base_principal['interesse'])
-    my_form_3.write('Total Publicações' )
-    my_form_3.write(len(base_principal['publicacao']))
-    my_form_3.write('Citado por ')
-    my_form_3.write( base_principal['citado'])
-    my_form_3.write('i10')
-    my_form_3.write(base_principal['i10'])
-    my_form_3.write('hindex')
-    my_form_3.write(base_principal['hindex'])
-    my_form_3.write('Soma da Pontuação qualis')
-    my_form_3.write(tabela["Pontuação"].sum())
     my_form_3.table(tabela)         
 
 def main():
   Executa()
+
 main()      
