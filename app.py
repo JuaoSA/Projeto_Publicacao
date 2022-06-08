@@ -626,7 +626,6 @@ def gera_ontologia(base_principal):
 def Executa():
   autor= []
   autor_name = []
-  st.set_page_config(layout="wide")
 
   Autor = st.text_input(label='Nome do Pesquisador')
   autor = buscaScholar(Autor)
