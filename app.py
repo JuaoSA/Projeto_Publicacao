@@ -648,8 +648,9 @@ def gera_ontologia(base_principal):
       f.write(s)
   return data_qualis    
 
-
-
+def convert_df(df):
+     # IMPORTANT: Cache the conversion to prevent computation on every rerun
+     return df.to_csv().encode('utf-8')
 
 
 
@@ -674,7 +675,15 @@ def Executa():
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
     st.dataframe(tabela)
-
+    csv = convert_df(my_large_df)
+    st.download_button(
+     label="Download data as CSV",
+     data=csv,
+     file_name='large_df.csv',
+     mime='text/csv',)
+    
+    
+    
 def main():
   Executa()
 
