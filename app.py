@@ -1,13 +1,5 @@
-import streamlit.components.v1 as components
-from streamlit.proto.Empty_pb2 import Empty
-from st_aggrid import AgGrid, GridOptionsBuilder
-from st_aggrid.shared import GridUpdateMode
-import streamlit_modal as modal
-from streamlit_elements import elements, mui, html
-from streamlit_elements import sync
+
 import streamlit as st
-from streamlit_elements import lazy
-from st_aggrid import AgGrid
 import datetime
 import re
 import rdflib
@@ -658,20 +650,7 @@ def gera_ontologia(base_principal):
 
 
 
-def aggrid_interactive_table(df: pandas.DataFrame):
-    options = GridOptionsBuilder.from_dataframe(
-        df, enableRowGroup=True, enableValue=True, enablePivot=True
-    )
-    options.configure_side_bar()
-    selection = AgGrid(
-        df,
-        enable_enterprise_modules=True,
-        gridOptions=options.build(),
-        theme="light",
-        update_mode=GridUpdateMode.MODEL_CHANGED,
-        allow_unsafe_jscode=True,
-    )
-    return selection
+
 
 
 
