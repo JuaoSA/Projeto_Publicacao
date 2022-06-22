@@ -675,11 +675,11 @@ def Executa():
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
     st.dataframe(tabela)
-    csv = convert_df(my_large_df)
+    csv = convert_df(tabela)
     st.download_button(
      label="Download data as CSV",
      data=csv,
-     file_name='large_df.csv',
+     file_name='Artigos_Qualis.csv',
      mime='text/csv',)
     
     
