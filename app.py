@@ -673,7 +673,7 @@ def Executa():
     semantic = buscaSemantic(info)
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
-    col2.dataframe(tabela)
+    st.dataframe(tabela)
 
 def main():
   Executa()
