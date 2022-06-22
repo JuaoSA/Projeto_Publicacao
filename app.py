@@ -1,6 +1,15 @@
+import streamlit.components.v1 as components
+from streamlit.proto.Empty_pb2 import Empty
+from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid.shared import GridUpdateMode
+import streamlit_modal as modal
+from streamlit_elements import elements, mui, html
+from streamlit_elements import sync
+import streamlit as st
+from streamlit_elements import lazy
+from st_aggrid import AgGrid
 import datetime
 import re
-import streamlit as st
 import rdflib
 from rdflib.graph import Graph
 from rdflib import URIRef, BNode, Literal
@@ -10,8 +19,8 @@ from rdflib.plugins import sparql
 import owlrl
 from SPARQLWrapper import SPARQLWrapper, JSON, XML, N3, TURTLE, JSONLD
 import unicodedata
-from texthero import preprocessing
-import texthero as hero
+#import texthero as hero
+#from texthero import preprocessing
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import pandas
@@ -29,7 +38,7 @@ def buscaScholar(autor):
   for x in search_query:
       dados.append(scholarly.fill(x, sections=['basics', 'indices','publications']))
   return dados
-@st.cache()
+
 def buscaInfo(autor,posicao):
   date = datetime.date.today()
   year = int(date.strftime("%Y")) - 5
@@ -37,6 +46,7 @@ def buscaInfo(autor,posicao):
   publicacoes = autor_dados['publications']
   informacoes = autor_dados
   publi= [] 
+  
   for p in publicacoes:
     if not 'pub_year' in  p['bib']:
           p['bib']['pub_year'] = '0000'
@@ -106,6 +116,8 @@ def buscaInfo(autor,posicao):
 
 def buscaSemantic(Autor_Info):
     titulos = []
+    date = datetime.date.today()
+    year = int(date.strftime("%Y")) - 5
     sch = SemanticScholar(timeout=5)
     for t in Autor_Info['publicacao']:
         if_contains_t = t['title']
@@ -126,27 +138,38 @@ def buscaSemantic(Autor_Info):
                             titulos.append(t['title'].lower())
 
                         for t in semantic_dados['papers']:
+
                             match = process.extract(t['title'].lower(), titulos,
                                                     scorer=fuzz.token_sort_ratio)
+                            
                             if match[0][1] < 60:
                                 paperid = str(t['paperId'])
                                 paper = sch.paper(paperid)
-                                Autor_Info['publicacao'].append({'title': paper['title'],
-                                        'pub_year': paper['year'], 'veiculo': paper['venue'
-                                        ]})
+                                if int( paper['year']) >= year: 
+                                  Autor_Info['publicacao'].append({'title': paper['title'],
+                                          'pub_year': paper['year'], 'veiculo': paper['venue'
+                                          ]})
                                 
                     return Autor_Info
                     break
 def qualis (Autor_Info):
 
-  _pr = pandas.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRqi1UUf_cTEj1B4VWMCHk3fhzcMQgsyH3jSox1m-G6CuOuUniUuLc8GK6yjMY4CnUWZd_V77sCuYut/pub?output=csv')
-  _pr['Área de Avaliação'] = _pr['Área de Avaliação'].str.strip()
-  _pr['Área de Avaliação'].tolist()
-  _pr['Estrato'] = _pr['Estrato'].str.strip()
-  _pr['Estrato'].tolist()
+  date = datetime.date.today()
+
+  year = int(date.strftime("%Y")) - 5
+
+
+
+
+
+  pr = pandas.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vR5Yh4bVduc_8klLjiqyDjHnJJNrN-apypzu_lAVp4criAM-ATkwqifaRkO_jEvm41yu76H09ZXuqWN/pub?output=csv')
+  #_pr['Área de Avaliação'] = _pr['Área de Avaliação'].str.strip()
+  #_pr['Área de Avaliação'].tolist()
+  #_pr['Estrato'] = _pr['Estrato'].str.strip()
+ # _pr['Estrato'].tolist()
   
-  pr = _pr.loc[_pr['Área de Avaliação'].values == 'CIÊNCIA DA COMPUTAÇÃO'] 
-  pr = pr.reset_index(drop=True)
+  #pr = _pr.loc[_pr['Área de Avaliação'].values == 'CIÊNCIA DA COMPUTAÇÃO'] 
+  #pr = pr.reset_index(drop=True)
 
   cn = pandas.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vT7FcK0i4UN6ULcLFlEa7FO2E0vemz-9VfIwEtaOW6PnP4eAzCyzJ1BPwtATk0ZKUKVBvHaT5Mx2TBV/pub?output=csv')
 
@@ -170,47 +193,50 @@ def qualis (Autor_Info):
   #cn = cn.drop(0)
  # pr = pr.drop(0)
 
-  custom_pipeline = [preprocessing.fillna, 
-                        preprocessing.lowercase,
-                        preprocessing.remove_whitespace,
-                        preprocessing.remove_punctuation]
-  cn['conferencia_limpo'] = hero.clean(cn['conferencia'],
-              custom_pipeline)
-  pr['periodicos_limpo'] = hero.clean(pr['Título'],
-              custom_pipeline)
+  #custom_pipeline = [preprocessing.fillna, 
+                        #preprocessing.lowercase,
+                        #preprocessing.remove_whitespace,
+                       # preprocessing.remove_punctuation]
+  #cn['conferencia_limpo'] = hero.clean(cn['conferencia'],
+              #custom_pipeline)
+  #pr['periodicos_limpo'] = hero.clean(pr['Título'],
+              #custom_pipeline)
 
-  con = cn['conferencia_limpo'].values.tolist()
-  per = pr['periodicos_limpo'].values.tolist()
+
 
   for i in Autor_Info['publicacao']:
-
           
           peri = process.extractOne(i['veiculo'],
-                                   pr['periodicos_limpo'],
-                                    scorer=fuzz.token_set_ratio)
+                                   pr['periodico'],
+                                    scorer=fuzz.token_sort_ratio)
           conf = process.extractOne(i['veiculo'],
-                                    cn['conferencia_limpo'],
+                                    cn['sigla'],
                                     scorer=fuzz.token_set_ratio)
 
-          
+
+          print(i['veiculo'], peri[1], conf[1])
           if peri[1] > conf[1] : 
-            if peri[1] >= 95:
-                df_mask=pr['periodicos_limpo'] == str(peri[0])
+            print(peri[0])
+            if peri[1] >= 90:
+                df_mask=pr['periodico'] == str(peri[0])
                 filtered_df = pr[df_mask]
-                i['Qualis'] = str(filtered_df.iat[0,3])
+                i['Qualis'] = str(filtered_df.iat[0,5])
                 #i['veiculo'] = str(filtered_df.iat[0,1])
                 i['inss'] = str(filtered_df.iat[0,0])
                 i['tipo_evento'] = 'periodico'
           else:
-            if conf[1] >= 95:
-              df_mask=cn['conferencia_limpo'] == str(conf[0])
+            if conf[1] >= 90:
+              print(conf[0])
+              df_mask=cn['sigla'] == str(conf[0])
               filtered_df = cn[df_mask]
               i['Qualis'] = str(filtered_df.iat[0,6])
               #i['veiculo'] = str(filtered_df.iat[0,3])
               i['sigla'] = str(filtered_df.iat[0,0])
               i['tipo_evento'] = 'conferencia'
 
-  return Autor_Info  
+  return Autor_Info     
+
+          
 def clear_char(palavra):
 
     # Unicode normalize transforma um caracter em seu equivalente em latin.
@@ -310,7 +336,7 @@ def gera_ontologia(base_principal):
 
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Ano
   :Edicao_Ano rdf:type owl:DatatypeProperty ;
-              rdfs:domain :Veiculo .
+              rdfs:domain :Texto_Autoral_Cientifico_Publicado .
 
 
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Nome
@@ -517,7 +543,7 @@ def gera_ontologia(base_principal):
       g.add((pp[publicacao], RDF.type, pp.Publicacao))
       g.add((pp[titulo_clean], pp.Submetido, pp[publicacao]))
       g.add((pp[veiculo_clean], RDF.type, pp.Veiculo))
-      g.add((pp[veiculo_clean], pp.Edicao_Ano, Literal(base_principal['publicacao'][x]['pub_year'])))
+      g.add((pp[titulo_clean], pp.Edicao_Ano, Literal(base_principal['publicacao'][x]['pub_year'])))
       g.add((pp[veiculo_clean], pp.Edicao_Nome, Literal(veiculo)))
       g.add((pp[publicacao], pp.Publicado_em , pp[veiculo_clean]))  
 
@@ -526,7 +552,7 @@ def gera_ontologia(base_principal):
           qualis = base_principal['publicacao'][x]['Qualis']
           #qualis_clear = re.sub('[,|\s]+', '_', clear_char(qualis))
           g.add((pp[veiculo_clean], pp.Classificada, pp[qualis]))
-          g.add((pp[veiculo_clean], pp.Edicao_Tipo, Literal(base_principal['publicacao'][x]['tipo_publi'])))
+          g.add((pp[veiculo_clean], pp.Edicao_Tipo, Literal(base_principal['publicacao'][x]['tipo_evento'])))
       else: 
           #g.add((pp[veiculo_clean], pp.Classificada, pp["C"]))
           g.add((pp[veiculo_clean], pp.Edicao_Tipo, Literal('Não Especificado')))
@@ -534,16 +560,17 @@ def gera_ontologia(base_principal):
 
   #g.serialize(data = ontologia, format='turtle')
   qres = g.query(
-    """SELECT ?titulo ?q ?evento ?tipo
+    """SELECT ?titulo ?data ?q ?evt ?tipo ?evento
       WHERE
         { 
          ?artigo a pp:Texto_Autoral_Cientifico_Publicado;
-              pp:Titulo_Artigo ?titulo.
+              pp:Titulo_Artigo ?titulo;
+              pp:Edicao_Ano ?data.
+              FILTER (?data >= """+year+""")
          ?artigo pp:Submetido ?y.
           ?y pp:Publicado_em ?evento.
-          ?evento  pp:Edicao_Tipo ?tipo.
-          ?evento  pp:Edicao_Ano ?data.
-            FILTER (?data >= """+year+""")
+          ?evento pp:Edicao_Nome ?evt.
+          ?evento  pp:Edicao_Tipo ?tipo.          
           ?evento pp:Classificada ?qualis.
          ?qualis pp:Qualis_Extrato ?q.
          }""")
@@ -563,9 +590,11 @@ def gera_ontologia(base_principal):
   for row in qres:
         d = {
         'Titulo' : re.search("([^']*)",str(row.titulo)).string,
-        'Evento': re.search("([^']*)",str(row.evento)).string,
+        'Evento': re.search("([^']*)",str(row.evt)).string,
         'Tipo' : re.search("([^']*)",str(row.tipo)).string,
-        'Qualis': re.search("([^']*)",str(row.q)).string,}
+        'Qualis': re.search("([^']*)",str(row.q)).string,
+        'Ano': re.search("([^']*)",str(row.data)).string,}
+
         p.append(d)
   for x in range(len(p)):
         if p[x]['Tipo'] == 'journal' :
@@ -623,25 +652,51 @@ def gera_ontologia(base_principal):
 
   data_qualis = pandas.DataFrame(data=p)
   s = g.serialize(format='turtle')
+  with open("Ontologia_Publicacao"+".ttl", 'w') as f:
+      f.write(s)
+  return data_qualis    
 
-  return data_qualis   
+
+
+def aggrid_interactive_table(df: pandas.DataFrame):
+    options = GridOptionsBuilder.from_dataframe(
+        df, enableRowGroup=True, enableValue=True, enablePivot=True
+    )
+    options.configure_side_bar()
+    selection = AgGrid(
+        df,
+        enable_enterprise_modules=True,
+        gridOptions=options.build(),
+        theme="light",
+        update_mode=GridUpdateMode.MODEL_CHANGED,
+        allow_unsafe_jscode=True,
+    )
+    return selection
+
+
+
 def Executa():
+
   autor= []
   autor_name = []
 
-  Autor = st.text_input(label='Nome do Pesquisador')
+  col1, col2 = st.columns([1, 3])
+
+  col1.subheader("Buscador")
+  Autor = col1.text_input(label='Nome do Pesquisador')
   autor = buscaScholar(Autor)
   for x in range(len(autor)):
     autor_name.append(autor[x]['name'])
-  escolha = st.selectbox('Pesquisadores', autor_name)  
-  if st.button(label='Buscar'):
+  escolha = col1.selectbox('Pesquisadores', autor_name) 
+  if col1.button(label='Buscar'):
     i = autor_name.index(escolha)
     info = buscaInfo(autor,i)
     semantic = buscaSemantic(info)
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
-    st.dataframe(tabela)
+    col2.dataframe(tabela)
+
 def main():
   Executa()
 
-main()      
+main()  
