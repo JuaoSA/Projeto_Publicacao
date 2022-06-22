@@ -11,5 +11,3 @@ semanticscholar==0.2.1
 SPARQLWrapper==1.8.5
 sslproxies==0.1.0
 streamlit==1.2.0
-streamlit-aggrid==0.2.3.post2 
-streamlit-elements==0.1.0 
