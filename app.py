@@ -615,7 +615,7 @@ def gera_ontologia(base_principal):
                 p[x][ 'Pontuação'] = 0.200
 
             if p[x]['Qualis'] == 'B3':
-                d[ 'Pontuação'] =  0.100
+                p[x][ 'Pontuação'] =  0.100
 
             if p[x]['Qualis'] == 'B4':
                 p[x][ 'Pontuação'] =  0.050
