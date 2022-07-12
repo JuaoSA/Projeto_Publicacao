@@ -596,7 +596,6 @@ def gera_ontologia(base_principal):
 
         p.append(d)
   for x in range(len(p)):
-        if p[x]['Tipo'] == 'journal' :
             if  p[x]['Qualis'] == 'A1':
                 p[x][ 'Pontuação'] = 1.000
 
@@ -622,32 +621,7 @@ def gera_ontologia(base_principal):
                 p[x][ 'Pontuação'] =  0.050
             if p[x]['Qualis'] == 'C':
                 p[x][ 'Pontuação'] =  0.000   
-        if p[x]['Tipo'] == 'conference':
-            if p[x]['Qualis'] == 'A1':
-                p[x][ 'Pontuação'] = 1.000
-              
-            if p[x]['Qualis'] == 'A2':
-                p[x][ 'Pontuação'] =  0.875
-
-            if p[x]['Qualis'] == 'A3':
-                p[x][ 'Pontuação'] = 0.750
-
-            if p[x]['Qualis'] == 'A4':
-                p[x][ 'Pontuação'] =  0.625
-
-            if p[x]['Qualis'] == 'B1':
-                p[x][ 'Pontuação'] =  0.500
-
-            if p[x]['Qualis'] == 'B2':
-                p[x][ 'Pontuação'] = 0.200
-
-            if p[x]['Qualis'] == 'B3':
-                p[x][ 'Pontuação'] = 0.100
-
-            if p[x]['Qualis'] == 'B4':
-                p[x][ 'Pontuação'] =  0.050
-            if p[x]['Qualis'] == 'C':
-                p[x][ 'Pontuação'] =  0.000   
+         
 
   data_qualis = pandas.DataFrame(data=p)
   s = g.serialize(format='turtle')
