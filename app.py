@@ -591,7 +591,8 @@ def gera_ontologia(base_principal):
         'Evento': re.search("([^']*)",str(row.evt)).string,
         'Tipo' : re.search("([^']*)",str(row.tipo)).string,
         'Qualis': re.search("([^']*)",str(row.q)).string,
-        'Ano': re.search("([^']*)",str(row.data)).string,}
+        'Ano': re.search("([^']*)",str(row.data)).string,
+        'Pontuação': 0,}
 
         p.append(d)
   for x in range(len(p)):
