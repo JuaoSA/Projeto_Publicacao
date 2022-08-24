@@ -22,10 +22,10 @@ import requests
 import json
 from bs4 import BeautifulSoup
 from scholarly import scholarly
-from scholarly import ProxyGenerator
-pg = ProxyGenerator()
-pg.FreeProxies()
-scholarly.use_proxy(pg)
+#from scholarly import ProxyGenerator
+#pg = ProxyGenerator()
+#pg.FreeProxies()
+#scholarly.use_proxy(pg)
 
 
 
