@@ -1,4 +1,3 @@
-
 import streamlit as st
 import datetime
 import re
@@ -259,231 +258,145 @@ def gera_ontologia(base_principal):
   @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
   @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
   @base <http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao> .
-
   <http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao> rdf:type owl:Ontology .
-
   #################################################################
   #    Object Properties
   #################################################################
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Afiliado
   :Afiliado rdf:type owl:ObjectProperty ;
             rdfs:domain :Autor_Cientifico ;
             rdfs:range :Instituicao .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Classificada
   :Classificada rdf:type owl:ObjectProperty ;
                 rdfs:domain :Veiculo ;
                 rdfs:range :Qualis .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Detem
   :Detem rdf:type owl:ObjectProperty ;
         rdfs:domain :Autor_Cientifico ;
         rdfs:range :Autoria_Cientifica .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Pesquisa
   :Pesquisa rdf:type owl:ObjectProperty ;
             rdfs:domain :Autor_Cientifico ;
             rdfs:range :Area_Pesquisa .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicado_em
   :Publicado_em rdf:type owl:ObjectProperty ;
                 rdfs:domain :Publicacao ;
                 rdfs:range :Veiculo .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Refere_se
   :Refere_se rdf:type owl:ObjectProperty ;
             rdfs:domain :Autoria_Cientifica ;
             rdfs:range :Texto_Autoral_Cientifico_Publicado .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Submetido
   :Submetido rdf:type owl:ObjectProperty ;
             rdfs:domain :Texto_Autoral_Cientifico_Publicado ;
             rdfs:range :Publicacao .
-
-
   #################################################################
   #    Data properties
   #################################################################
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa
   :Area_Pesquisa rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Area_Pesquisa .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Citacao
   :Autor_Citacao rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Autor_Cientifico .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_IndiceH
   :Autor_IndiceH rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Autor_Cientifico .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_indiceI10
   :Autor_indiceI10 rdf:type owl:DatatypeProperty ;
                   rdfs:domain :Autor_Cientifico .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Ano
   :Edicao_Ano rdf:type owl:DatatypeProperty ;
               rdfs:domain :Texto_Autoral_Cientifico_Publicado .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Nome
   :Edicao_Nome rdf:type owl:DatatypeProperty ;
               rdfs:domain :Veiculo .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Edicao_Tipo
   :Edicao_Tipo rdf:type owl:DatatypeProperty ;
               rdfs:domain :Veiculo .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao
   :Instituicao rdf:type owl:DatatypeProperty ;
               rdfs:domain :Instituicao .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Nome_Autor
   :Nome_Autor rdf:type owl:DatatypeProperty ;
               rdfs:domain :Autor_Cientifico .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao_Citacao
   :Publicacao_Citacao rdf:type owl:DatatypeProperty ;
                       rdfs:domain :Publicacao .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis_Extrato
   :Qualis_Extrato rdf:type owl:DatatypeProperty ;
                   rdfs:domain :Qualis .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Titulo_Artigo
   :Titulo_Artigo rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Texto .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo_Codigo
   :Veiculo_Codigo rdf:type owl:DatatypeProperty ;
                   rdfs:domain :Veiculo .
-
-
   #################################################################
   #    Classes
   #################################################################
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Area_Pesquisa
   :Area_Pesquisa rdf:type owl:Class .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autor_Cientifico
   :Autor_Cientifico rdf:type owl:Class ;
                     rdfs:subClassOf :Pessoa .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Autoria_Cientifica
   :Autoria_Cientifica rdf:type owl:Class .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Instituicao
   :Instituicao rdf:type owl:Class .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Pessoa
   :Pessoa rdf:type owl:Class .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Publicacao
   :Publicacao rdf:type owl:Class .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Qualis
   :Qualis rdf:type owl:Class .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto
   :Texto rdf:type owl:Class .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Texto_Autoral_Cientifico_Publicado
   :Texto_Autoral_Cientifico_Publicado rdf:type owl:Class ;
                                       rdfs:subClassOf :Texto .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#Veiculo
   :Veiculo rdf:type owl:Class .
-
-
   #################################################################
   #    Individuals
   #################################################################
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A1
   :A1 rdf:type owl:nomedIndividual ,
               :Qualis ;
       :Qualis_Extrato "A1" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A2
   :A2 rdf:type owl:NamedIndividual ,
               :Qualis ;
       :Qualis_Extrato "A2" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A3
   :A3 rdf:type owl:NamedIndividual ,
               :Qualis ;
       :Qualis_Extrato "A3" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#A4
   :A4 rdf:type owl:NamedIndividual ,
               :Qualis ;
       :Qualis_Extrato "A4" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B1
   :B1 rdf:type owl:NamedIndividual ,
               :Qualis ;
       :Qualis_Extrato "B1" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B2
   :B2 rdf:type owl:NamedIndividual ,
               :Qualis ;
       :Qualis_Extrato "B2" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B3
   :B3 rdf:type owl:NamedIndividual ,
               :Qualis ;
       :Qualis_Extrato "B3" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#B4
   :B4 rdf:type owl:NamedIndividual ,
               :Qualis ;
       :Qualis_Extrato "B4" .
-
-
   ###  http://www.semanticweb.org/fantasma/ontologies/2021/10/Publicacao#C
   :C rdf:type owl:NamedIndividual ,
               :Qualis ;
     :Qualis_Extrato "C" .
-
-
   ###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
-
-
   """
   
   ontologia = g.parse(data=n3data, format='ttl')
@@ -650,16 +563,12 @@ def Executa():
     autor_name.append(autor[x]['name'])
   escolha = col1.selectbox('Pesquisadores', autor_name) 
   if col1.button(label='Buscar'):
-    i = autor_name.index()
+    i = autor_name.index(escolha)
     info = buscaInfo(autor,i)
     semantic = buscaSemantic(info)
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
     st.dataframe(tabela)
-    
-    sums=tabela["Pontuacao"].sum()
-    st.write('Soma da Pontuação qualis')
-    st.write(sums)
     csv = convert_df(tabela)
     st.download_button(
      label="Download data as CSV",
