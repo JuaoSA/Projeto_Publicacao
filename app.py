@@ -656,6 +656,18 @@ def Executa():
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
     st.dataframe(tabela)
+    st.write(base['name'])
+        st.write('Afiliação')
+        st.write(base['affiliation'])
+        st.write('Interesses')
+        st.write(base['interests'])
+        st.write('Total Publicações' )
+        st.write(len(base['publications']))
+        st.write('Citado por ')
+        st.write( base['citedby'])
+        sums=tabela["Pontuacao"].sum()
+        st.write('Soma da Pontuação qualis')
+        st.write(sums)
     csv = convert_df(tabela)
     st.download_button(
      label="Download data as CSV",
