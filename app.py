@@ -650,7 +650,7 @@ def Executa():
     autor_name.append(autor[x]['name'])
   escolha = col1.selectbox('Pesquisadores', autor_name) 
   if col1.button(label='Buscar'):
-    i = autor_name.index(  )
+    i = autor_name.index()
     info = buscaInfo(autor,i)
     semantic = buscaSemantic(info)
     base_principal = qualis(semantic)
