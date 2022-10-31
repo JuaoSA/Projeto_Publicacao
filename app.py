@@ -556,25 +556,40 @@ def Executa():
 
   col1, col2 = st.columns([1, 3])
 
-  col1.subheader("Buscador")
-  Autor = col1.text_input(label='Nome do Pesquisador')
+  st.sidebar.subheader("Buscador")
+  Autor = st.sidebar.text_input(label='Nome do Pesquisador')
   autor = buscaScholar(Autor)
   for x in range(len(autor)):
     autor_name.append(autor[x]['name'])
-  escolha = col1.selectbox('Pesquisadores', autor_name) 
-  if col1.button(label='Buscar'):
+  escolha = st.sidebar.selectbox('Pesquisadores', autor_name) 
+  if st.sidebar.button(label='Buscar'):
     i = autor_name.index(escolha)
     info = buscaInfo(autor,i)
     semantic = buscaSemantic(info)
     base_principal = qualis(semantic)
     tabela = gera_ontologia(base_principal)
-    st.dataframe(tabela)
-    csv = convert_df(tabela)
-    st.download_button(
-     label="Download data as CSV",
-     data=csv,
-     file_name='Artigos_Qualis.csv',
-     mime='text/csv',)
+   
+    teste = ''
+    for c in info['interesse'] :  
+      teste += c + ", "
+    final_str = teste[:-2]
+    soma = tabela["Pontuação"].sum()
+    with st.container():
+      st.write(pandas.DataFrame({
+          'Autor': info['nome'], 
+          'Pontuação qualis ': soma,
+          'Afiliação': info['afilicao'],
+          'Interesses': final_str,
+      },index=[0]).style.hide_index())
+      st.dataframe(tabela)
+      csv = convert_df(tabela)
+
+      st.download_button(
+      label="Download data as CSV",
+      data=csv,
+      file_name='Artigos_Qualis.csv',
+      mime='text/csv',)
+    
     
     
     
